@@ -1,0 +1,61 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Library</h2>
+
+@*@(Html.Kendo().DatePicker().Name("datepicker"))*@
+
+<p>
+    @Html.ActionLink("Populate with test data", "TestDataPopulate")
+</p>
+
+@*http://demos.telerik.com/aspnet-mvc/grid/index*@
+<div id="clientsDb">
+    @(Html.Kendo().Grid<KendoUI_CodeFirst_Testing.Models.Library>()
+        .Name("grid")
+        .Columns(columns => {
+            columns.Bound(c => c.LibraryId).Width(50);
+            columns.Bound(c => c.Name);
+            columns.Bound(c => c.Location).Width(140);
+            //columns.Bound(c => c.ContactTitle).Width(190);
+            //columns.Bound(c => c.CompanyName);
+            //columns.Bound(c => c.Country).Width(110);
+
+            // Column commands/features.
+            columns.Command(commands => {
+                commands.Edit();
+                commands.Destroy();
+            }).Title("Commands").Width(200);
+        })
+        // Toolbar.
+        .ToolBar(t=>t.Create()) // Create Entity.
+        .Editable(e=>e.Mode(GridEditMode.InLine))
+        
+        .HtmlAttributes(new { style = "height: 380px;" })
+        .Scrollable()
+        .Groupable()
+        .Sortable()
+            // Pagination.
+        .Pageable(pageable => pageable
+            .Refresh(true)
+            .PageSizes(true)
+            .ButtonCount(5))
+            // Data Binding.
+            .DataSource(dataSource => dataSource
+            .WebApi() // Use Web API.
+            .Model(model => {
+                model.Id(library => library.LibraryId);// Specify unique identifier.
+                model.Field(library => library.LibraryId).Editable(false);
+            })
+                // Create Entity.
+            .Create(c => c.Url(Url.HttpRouteUrl("DefaultApi", new { controller = "Libraries" })))
+                // Request Data.
+            .Read(read => read.Url(Url.HttpRouteUrl("DefaultApi", new { controller = "Libraries" })))
+                // Update Data.
+            .Update(update => update.Url(Url.HttpRouteUrl("DefaultApi", new { controller = "Libraries", id = "{0}" })))
+                // Delete Data.
+            .Destroy(del => del.Url(Url.HttpRouteUrl("DefaultApi", new { controller = "Libraries", id = "{0}" })))
+        )
+    )
+</div>
